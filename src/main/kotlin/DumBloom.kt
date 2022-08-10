@@ -29,7 +29,7 @@ fun main() = application {
         keyboard.keyDown.listen {
             when (it.key) {
                 KEY_SPACEBAR -> useBloom = !useBloom
-                67 -> doClear = true
+                67 -> doClear = true // 'c'
                 else -> println(it.key)
             }
         }
