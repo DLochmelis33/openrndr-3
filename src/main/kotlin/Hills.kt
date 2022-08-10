@@ -69,18 +69,17 @@ fun main() = application {
             }
         }
 
-        val fromRy = converter.pxToReal(0, height * (1.3)).second
-        val untilRy = converter.pxToReal(0, height * (-0.6)).second
+        val fromRy = converter.pxToReal(0, height * (1.0)).second
+        val untilRy = converter.pxToReal(0, height * (-0.2)).second
 
-        val shapeCount = 10
-        var shapes = List(shapeCount) {
-            constructShape(genRandomWave(fromRy + (it.d / shapeCount) * (untilRy - fromRy)))
-        }
+        var shapeCount = 10
+        lateinit var shapes: List<Shape>
 
         lateinit var hills1: ColorRGBa
         lateinit var hills2: ColorRGBa
 
         fun generate() {
+            shapeCount = r.nextInt(4, 10)
             shapes = List(shapeCount) {
                 constructShape(genRandomWave(fromRy + (it.d / shapeCount) * (untilRy - fromRy)))
             }
@@ -92,9 +91,8 @@ fun main() = application {
         }
 
         fun Drawer.doDraw() {
-            backgroundColor = ColorRGBa.WHITE_SMOKE
+            backgroundColor = hills2
 //                strokeWeight = 1.0
-//                stroke = ColorRGBa.BLACK
             stroke = null
 
             for ((i, shape) in shapes.withIndex().reversed()) {
