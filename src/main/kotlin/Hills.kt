@@ -91,7 +91,8 @@ fun main() = application {
         }
 
         fun Drawer.doDraw() {
-            backgroundColor = hills2
+//            backgroundColor = ColorRGBa.BLUE -- doesn't save!
+            clear(ColorRGBa.BLUE)
 //                strokeWeight = 1.0
             stroke = null
 
