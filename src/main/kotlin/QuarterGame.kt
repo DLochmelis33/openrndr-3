@@ -1,12 +1,13 @@
 import org.openrndr.MouseButton
 import org.openrndr.application
+import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.isolated
 import org.openrndr.math.Vector2
 import org.openrndr.shape.*
 
-const val rows = 10
-const val cols = 10
+const val rows = 7
+const val cols = 7
 
 enum class Rotation(val angle: Double) {
     UL(0.0), UR(90.0), DR(180.0), DL(270.0);
@@ -46,7 +47,8 @@ fun main() = application {
     }
     program {
         val size = width.d / cols // TODO
-        val field: List<MutableList<Rotation>> = List(rows) { MutableList(cols) { Rotation.UL } }
+        var field: Array<Array<Rotation>> = Array(rows) { Array(cols) { Rotation.UL } }
+
         fun Drawer.drawField() {
             for (i in 0 until rows) {
                 for (j in 0 until cols) {
@@ -54,25 +56,47 @@ fun main() = application {
                     quarterCircle(at, size, field[i][j])
                 }
             }
+            fill = ColorRGBa.PINK
+            for (i in 0..rows) {
+                for (j in 0..cols) {
+                    circle(j * size, i * size, 5.0)
+                }
+            }
         }
+
+        // (i, j) == DR corner of 2x2 square
+        fun quadRotate(i: Int, j: Int, clockwise: Boolean) {
+            if (i !in 1 until rows || j !in 1 until cols) return
+            val froms = listOf(Pair(i - 1, j - 1), Pair(i - 1, j), Pair(i, j), Pair(i, j - 1))
+            val tos = froms.rotate(if (clockwise) 1 else -1)
+
+            val tmp = field.deepCopy()
+            for (t in 0..3) {
+                tmp[tos[t]] = field[froms[t]].rotated(clockwise)
+            }
+            field = tmp
+        }
+
         mouse.buttonDown.listen {
-            val i = it.position.y.toInt() * cols / height
-            val j = it.position.x.toInt() * rows / width
-            field[i][j] = field[i][j].rotated(it.button == MouseButton.LEFT)
+            val cells = (1 until rows).toList() * (1 until cols).toList()
+            val (i, j) = cells.minByOrNull { (i, j) ->
+                it.position.distanceTo(
+                    Vector2(
+                        j * size,
+                        i * size
+                    )
+                )
+            }!! // TODO x2
+            if (it.position.distanceTo(Vector2(j * size, i * size)) > size / 2.1) return@listen
+//            val i = (it.position.y * cols / height).toInt()
+//            val j = (it.position.x * rows / width).toInt()
+            val clockwise = it.button == MouseButton.LEFT
+//            field[i][j] = field[i][j].rotated(clockwise)
+            quadRotate(i, j, clockwise)
         }
         extend {
             drawer.run {
                 drawField()
-//                for (i in 100..400 step 100) {
-//                    quarterCircle(
-//                        Vector2(i.d, 400.0),
-//                        50.0,
-//                        run {
-//                            var r = Rotation.UL
-//                            repeat((i - 1) / 100) { r = r.rotated(true) }
-//                            r
-//                        })
-//                }
             }
         }
     }

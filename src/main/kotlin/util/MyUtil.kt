@@ -3,6 +3,7 @@ import org.openrndr.shape.Segment
 import java.lang.Math.acos
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
@@ -17,9 +18,6 @@ fun Random.weightedIndex(weights: List<Int>): Int {
 }
 
 val Int.d get() = toDouble()
-
-fun Segment.randomPoint(from: Double = 0.0, to: Double = 1.0, random: Random = Random) =
-    start + (end - start) * random.nextDouble(from, to)
 
 fun <T> List<T>.zipNextCyclic() = zip(subList(1, size) + first())
 
@@ -42,3 +40,18 @@ fun timestamp(): String {
 // wraparound get
 operator fun <T> Array<T>.invoke(i: Int) = this[(i + size) % size]
 operator fun <T> List<T>.invoke(i: Int) = this[(i + size) % size]
+
+fun <T> List<T>.rotate(shift: Int): List<T> {
+    val posShift = (if (shift < 0) shift + size * (abs(shift) / size + 1) else shift) % size
+    return subList(posShift, size) + subList(0, posShift)
+}
+
+operator fun <T> Array<Array<T>>.get(coords: Pair<Int, Int>): T = this[coords.first][coords.second]
+operator fun <T> Array<Array<T>>.set(coords: Pair<Int, Int>, value: T) {
+    this[coords.first][coords.second] = value
+}
+
+inline fun <reified T> Array<Array<T>>.deepCopy(): Array<Array<T>> = this.map { it.copyOf() }.toTypedArray()
+
+// flat!
+operator fun <T, U> List<T>.times(other: List<U>) = flatMap { t -> other.map { u -> Pair(t, u) } }
