@@ -38,3 +38,7 @@ fun timestamp(): String {
     val formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd_HH-mm-ss-SSS")
     return LocalDateTime.now().format(formatter)
 }
+
+// wraparound get
+operator fun <T> Array<T>.invoke(i: Int) = this[(i + size) % size]
+operator fun <T> List<T>.invoke(i: Int) = this[(i + size) % size]
