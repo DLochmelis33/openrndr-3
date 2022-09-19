@@ -6,8 +6,8 @@ import org.openrndr.draw.isolated
 import org.openrndr.math.Vector2
 import org.openrndr.shape.*
 
-const val rows = 7
-const val cols = 7
+private const val rows = 7
+private const val cols = 7
 
 enum class Rotation(val angle: Double) {
     UL(0.0), UR(90.0), DR(180.0), DL(270.0);

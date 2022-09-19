@@ -1,3 +1,5 @@
+import org.openrndr.Program
+import org.openrndr.color.ColorRGBa
 import org.openrndr.math.Vector2
 import org.openrndr.shape.Segment
 import java.lang.Math.acos
@@ -16,6 +18,8 @@ fun Random.weightedIndex(weights: List<Int>): Int {
     }
     return i - 1
 }
+
+fun Random.vec2(scale: Double) = Vector2(nextDouble(-scale, scale), nextDouble(-scale, scale))
 
 val Int.d get() = toDouble()
 
@@ -55,3 +59,28 @@ inline fun <reified T> Array<Array<T>>.deepCopy(): Array<Array<T>> = this.map { 
 
 // flat!
 operator fun <T, U> List<T>.times(other: List<U>) = flatMap { t -> other.map { u -> Pair(t, u) } }
+
+fun makeGrid(width: Int, height: Int, rows: Int, cols: Int) = List(rows) { i ->
+    List(cols) { j ->
+        Vector2(j * width.d / cols, i * height.d / rows)
+    }
+}
+
+fun Program.makeGrid(rows: Int, cols: Int) = makeGrid(width, height, rows, cols)
+
+interface RandomScope {
+    val rng: Double
+    val nrng: Double
+    val r: Random
+}
+
+fun <T> randomScope(seed: Long = 5, block: RandomScope.() -> T): T {
+    val rand = Random(seed)
+    return object : RandomScope {
+        override val r = rand
+        override val rng get() = rand.nextDouble()
+        override val nrng get() = rand.nextDouble(-1.0, 1.0)
+    }.block()
+}
+
+fun Random.nextRGB() = ColorRGBa(nextDouble(), nextDouble(), nextDouble())
