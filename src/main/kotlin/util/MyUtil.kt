@@ -1,7 +1,6 @@
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.Vector2
-import org.openrndr.shape.Segment
 import java.lang.Math.acos
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -9,11 +8,11 @@ import kotlin.math.abs
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
-fun Random.weightedIndex(weights: List<Int>): Int {
-    var t = nextInt(weights.sum())
+fun Random.weightedIndex(weights: List<Number>): Int {
+    var t = nextDouble(weights.sumOf { it.toDouble() })
     var i = 0
     while (i < weights.size && t >= 0) {
-        t -= weights[i]
+        t -= weights[i].toDouble()
         i++
     }
     return i - 1
@@ -84,3 +83,10 @@ fun <T> randomScope(seed: Long = 5, block: RandomScope.() -> T): T {
 }
 
 fun Random.nextRGB() = ColorRGBa(nextDouble(), nextDouble(), nextDouble())
+
+fun <T> Random.weightedChoice(weights: List<Number>, choices: List<T>) = choices[weightedIndex(weights)]
+
+fun <T> Random.weightedChoice(distribution: List<Pair<Double, T>>): T =
+    weightedChoice(distribution.map { it.first }, distribution.map { it.second })
+
+fun Random.coinflip(successProbability: Double = 0.5) = nextDouble() < successProbability
