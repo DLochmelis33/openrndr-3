@@ -6,3 +6,5 @@ out
 video/
 screenshots/
 gui-parameters/
+*.log
+saves/
