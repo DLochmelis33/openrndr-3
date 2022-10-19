@@ -8,3 +8,4 @@ screenshots/
 gui-parameters/
 *.log
 saves/
+ffmpegOutput.txt

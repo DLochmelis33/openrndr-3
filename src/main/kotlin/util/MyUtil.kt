@@ -90,3 +90,6 @@ fun <T> Random.weightedChoice(distribution: List<Pair<Double, T>>): T =
     weightedChoice(distribution.map { it.first }, distribution.map { it.second })
 
 fun Random.coinflip(successProbability: Double = 0.5) = nextDouble() < successProbability
+
+infix fun <T, U> Iterable<T>.product(other: Iterable<U>): Iterable<Pair<T, U>> =
+    flatMap { t -> other.map { u -> t to u } }
