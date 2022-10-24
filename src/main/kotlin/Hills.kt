@@ -7,7 +7,6 @@ import org.openrndr.draw.BufferMultisample
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.colorBuffer
 import org.openrndr.draw.renderTarget
-import org.openrndr.extras.color.presets.*
 import org.openrndr.math.Vector2
 import org.openrndr.shape.Shape
 import org.openrndr.shape.shape
@@ -52,10 +51,10 @@ fun main() = application {
 
     program {
         val converter = RealPx(this, 0.0, 0.0, width / (5.0 * 2.0))
-        val evalRealPts = ((-10)..(width + 10) step 5).map { converter.pxToReal(it, height / 2.0).toVector2() }
+        val evalRealPts = ((-10)..(width + 10) step 5).map { converter.fromPx(it, height / 2.0).toVector2() }
 
         fun constructShape(f: (Double) -> Double): Shape {
-            val calc = { real: Vector2 -> converter.realToPx(real.x, f(real.x)).toVector2() }
+            val calc = { real: Vector2 -> converter.fromReal(real.x, f(real.x)).toVector2() }
             return shape {
                 contour {
                     moveTo(0.0, height.d)
@@ -69,8 +68,8 @@ fun main() = application {
             }
         }
 
-        val fromRy = converter.pxToReal(0, height * (1.0)).second
-        val untilRy = converter.pxToReal(0, height * (-0.2)).second
+        val fromRy = converter.fromPx(0, height * (1.0)).second
+        val untilRy = converter.fromPx(0, height * (-0.2)).second
 
         var shapeCount = 10
         lateinit var shapes: List<Shape>

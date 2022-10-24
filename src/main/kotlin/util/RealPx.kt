@@ -10,38 +10,39 @@ class RealPx(
     height: Number,
     var xc: Double,
     var yc: Double,
-    var scale: Double, // how many pixels in one real unit
+    var pixelsInUnit: Double,
 ) {
-    constructor(p: Program, xc: Double, yc: Double, scale: Double) : this(p.width, p.height, xc, yc, scale)
+    constructor(p: Program, xc: Double, yc: Double, pixelsInUnit: Double) :
+            this(p.width, p.height, xc, yc, pixelsInUnit)
 
     val width = width.toDouble()
     val height = height.toDouble()
 
-    fun realToPx(x: Number, y: Number): Pair<Double, Double> {
+    fun fromReal(x: Number, y: Number): Pair<Double, Double> {
         return Pair(
-            ((x.toDouble() - xc) * scale + width.toDouble() / 2.0),
-            (-(y.toDouble() - yc) * scale + height.toDouble() / 2.0)
+            ((x.toDouble() - xc) * pixelsInUnit + width / 2.0),
+            (-(y.toDouble() - yc) * pixelsInUnit + height / 2.0)
         )
     }
 
-    fun realToPx(real: Vector2): Vector2 {
+    fun fromReal(real: Vector2): Vector2 {
         return Vector2(
-            ((real.x - xc) * scale + width.toDouble() / 2.0),
-            (-(real.y - yc) * scale + height.toDouble() / 2.0)
+            ((real.x - xc) * pixelsInUnit + width / 2.0),
+            (-(real.y - yc) * pixelsInUnit + height / 2.0)
         )
     }
 
-    fun pxToReal(j: Number, i: Number): Pair<Double, Double> {
+    fun fromPx(j: Number, i: Number): Pair<Double, Double> {
         return Pair(
-            (j.toDouble() - width.toDouble() / 2.0) / scale + xc,
-            -(i.toDouble() - height.toDouble() / 2.0) / scale + yc
+            (j.toDouble() - width / 2.0) / pixelsInUnit + xc,
+            -(i.toDouble() - height / 2.0) / pixelsInUnit + yc
         )
     }
 
-    fun pxToReal(px: Vector2): Vector2 {
+    fun fromPx(px: Vector2): Vector2 {
         return Vector2(
-            (px.x - width.toDouble() / 2.0) / scale + xc,
-            -(px.y - height.toDouble() / 2.0) / scale + yc
+            (px.x - width / 2.0) / pixelsInUnit + xc,
+            -(px.y - height / 2.0) / pixelsInUnit + yc
         )
     }
 
@@ -50,10 +51,12 @@ class RealPx(
     }
 
     fun realScope(px: Vector2, realBlock: RealScope.() -> Vector2): Vector2 {
-        return realToPx(object : RealScope {
-            override val t get() = pxToReal(px)
+        return fromReal(object : RealScope {
+            override val t get() = fromPx(px)
         }.realBlock())
     }
+
+    fun <T> withReal(px: Vector2, realBlock: (Vector2) -> T) = realBlock(fromPx(px))
 }
 
 fun Pair<Double, Double>.toVector2() = Vector2(first, second)
