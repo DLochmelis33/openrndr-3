@@ -1,24 +1,24 @@
 import org.openrndr.Fullscreen
 import org.openrndr.KEY_ESCAPE
 import org.openrndr.application
+import org.openrndr.color.ColorRGBa
 import org.openrndr.math.Vector2
 import util.RealPx
+import util.VectorField
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.system.exitProcess
 
-private const val rows = 720 / 4
-private const val cols = 1080 / 4
-private const val speed = 0.01
+private const val rows = 720 / 8
+private const val cols = 1080 / 8
+private const val speed = 0.02
 
 private val seed: Long = 5
 private fun u(x: Double, y: Double) = randomScope(seed) { nrng * sin(nrng * x + nrng * y) }
 private fun v(x: Double, y: Double) = randomScope(seed + 1) { nrng * cos(nrng * x + nrng * y) }
 
-private fun vf(p: Vector2): Vector2 {
-    val (x, y) = p
-    return Vector2(u(x, y), v(x, y))
-}
+private val vf = VectorField { (x, y) -> Vector2(u(x, y), v(x, y)) }
 
 fun main() = application {
     configure {
@@ -39,8 +39,11 @@ fun main() = application {
                     t + vf(t) * speed
                 }
             }
-            drawer.stroke = null
-            drawer.circles(pts, 3.0)
+            for(point in pts) {
+                drawer.stroke = ColorRGBa.YELLOW.shade(abs(vf.divergence(rp.fromPx(point))))
+                drawer.strokeWeight = 2.0
+                drawer.circle(point, 3.0)
+            }
         }
     }
 }

@@ -16,6 +16,16 @@ class VectorField private constructor(private val f: (Vector2) -> Vector2) : ((V
         }
     }
 
+    val curl2d: ScalarField by lazy {
+        ScalarField { v ->
+            val xh = Vector2.UNIT_X * h
+            val yh = Vector2.UNIT_Y * h
+            val dxv = (this(v + xh) - this(v - xh)) / (2 * h)
+            val dyv = (this(v + yh) - this(v - yh)) / (2 * h)
+            dxv.x - dyv.y
+        }
+    }
+
     companion object {
         operator fun invoke(f: (Vector2) -> Vector2) = VectorField(f)
     }
@@ -37,3 +47,8 @@ class ScalarField private constructor(private val f: (Vector2) -> Double) : ((Ve
         operator fun invoke(f: (Vector2) -> Double) = ScalarField(f)
     }
 }
+
+val ((Double) -> Double).diff
+    get() = { x: Double ->
+        (this(x + h) - this(x - h)) / (2 * h)
+    }
