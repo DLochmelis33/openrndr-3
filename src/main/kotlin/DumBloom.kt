@@ -42,11 +42,10 @@ fun main() = application {
         }
 
         val bloom = GaussianBloom().apply {
-            gain = 2.0
-            shape = 0.0 // size but works at 0.0
-            sigma = 5.0 // also size?
-            window = 50
-            noiseGain = 0.0
+            sigma = 2.0
+            window = 5
+            noiseGain = 0.05
+            passes = 2
         }
 
         val rt1 = renderTarget(width, height) { colorBuffer() }
@@ -56,7 +55,7 @@ fun main() = application {
 
         extend {
             drawer.isolatedWithTarget(rt1) {
-                drawer.fill = ColorRGBa.WHITE
+                drawer.fill = ColorRGBa.GREEN
                 drawer.stroke = null
 
                 drawer.circles(circles, curSize)
