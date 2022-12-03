@@ -106,3 +106,6 @@ fun Random.point(triangle: Triangle): Vector2 {
 
 fun Random.point(rectangle: Rectangle) =
     rectangle.corner + Vector2(nextDouble() * rectangle.width, nextDouble() * rectangle.height)
+
+infix fun <T, U> Iterable<T>.product(other: Iterable<U>): Iterable<Pair<T, U>> =
+    flatMap { t -> other.map { u -> t to u } }
