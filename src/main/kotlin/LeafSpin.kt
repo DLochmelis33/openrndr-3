@@ -1,5 +1,7 @@
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
+import org.openrndr.draw.Drawer
+import org.openrndr.draw.isolated
 import org.openrndr.extra.compositor.compose
 import org.openrndr.extra.compositor.draw
 import org.openrndr.extra.compositor.post
@@ -15,13 +17,18 @@ fun main() = application {
     }
     program {
 
-        val composite = compose {
+        class Leaf(val sphereRadius: Double, val basisUnit: Double) {
+            var isDone = false
+                private set
 
-            draw {
-                val sphereRadius = 200.0
-                val basisUnit = 30.0
-                val theta = seconds * 50.0
-                val phi = seconds * 20.0
+            fun draw(drawer: Drawer, seconds: Double) {
+                if (isDone) return
+                val theta = -90 + seconds * 20.0
+                if (theta > 90.0) {
+                    isDone = true
+                    return
+                }
+                val phi = seconds * 5.0 + 70.0
 
                 val stem = Spherical(theta, phi, sphereRadius).cartesian
                 val a = Spherical(theta + 90.0, 90.0, basisUnit).cartesian
@@ -40,16 +47,22 @@ fun main() = application {
                     close()
                 }
 
-                drawer.apply {
-                    fill = null
+                drawer.isolated {
+                    fill = ColorRGBa.GREEN
                     stroke = ColorRGBa.WHITE
-                    translate(width / 2.0, height / 2.0)
-                    lineSegment(Vector2.ZERO, stem.xy)
                     translate(stem.xy)
                     contour(projSquare)
                 }
             }
+        }
 
+        val leaf = Leaf(200.0, 50.0)
+
+        val composite = compose {
+            draw {
+                drawer.translate(drawer.bounds.center)
+                leaf.draw(drawer, seconds)
+            }
             post(GaussianBloom()) {
                 sigma = 2.0
                 passes = 2

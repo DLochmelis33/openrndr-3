@@ -1,6 +1,8 @@
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.Vector2
+import org.openrndr.shape.Rectangle
+import org.openrndr.shape.Triangle
 import java.lang.Math.acos
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -90,3 +92,17 @@ fun <T> Random.weightedChoice(distribution: List<Pair<Double, T>>): T =
     weightedChoice(distribution.map { it.first }, distribution.map { it.second })
 
 fun Random.coinflip(successProbability: Double = 0.5) = nextDouble() < successProbability
+
+fun Random.point(triangle: Triangle): Vector2 {
+    val u = triangle.run { x2 - x1 }
+    val v = triangle.run { x3 - x1 }
+    val coefSum = nextDouble()
+    val a = nextDouble(coefSum)
+    val b = coefSum - a
+    val result = triangle.x1 + u * a + v * b
+    assert(triangle.contains(result))
+    return result
+}
+
+fun Random.point(rectangle: Rectangle) =
+    rectangle.corner + Vector2(nextDouble() * rectangle.width, nextDouble() * rectangle.height)

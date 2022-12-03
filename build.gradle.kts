@@ -56,7 +56,7 @@ val orxFeatures = setOf(
 //  "orx-tensorflow",    
 //  "orx-time-operators",
 //  "orx-timer",
-//  "orx-triangulation",
+  "orx-triangulation",
 //  "orx-video-profiles",
     null
 ).filterNotNull()
