@@ -1,3 +1,4 @@
+import org.openrndr.Fullscreen
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.isolated
@@ -13,7 +14,7 @@ fun main() = application {
     configure {
         width = 1920
         height = 1080
-//        fullscreen = Fullscreen.SET_DISPLAY_MODE
+        fullscreen = Fullscreen.SET_DISPLAY_MODE
     }
     program {
         val size = 180.0
@@ -28,9 +29,10 @@ fun main() = application {
         val color1 = ColorRGBa.PINK
         val color2 = ColorRGBa.PINK.mix(ColorRGBa.YELLOW, 0.3)
 
-        videoExtend { _, seconds ->
+//        videoExtend { _, seconds ->
+        extend {
             val t = (sin(seconds * 0.8) + 1) / 2 // in [0, 1]
-            if(seconds * 0.8 >= 2 * PI) return@videoExtend false
+//            if(seconds * 0.8 >= 2 * PI) return@videoExtend false
 
             drawer.multisampling(8) {
                 clear(ColorRGBa.WHITE.shade(0.1))
@@ -56,7 +58,7 @@ fun main() = application {
                     }
                 }
             }
-            return@videoExtend true
+//            return@videoExtend true
         }
     }
 }
