@@ -1,6 +1,8 @@
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
+import org.openrndr.math.Polar
 import org.openrndr.math.Vector2
+import org.openrndr.shape.Circle
 import org.openrndr.shape.Rectangle
 import org.openrndr.shape.Triangle
 import java.lang.Math.acos
@@ -106,6 +108,8 @@ fun Random.point(triangle: Triangle): Vector2 {
 
 fun Random.point(rectangle: Rectangle) =
     rectangle.corner + Vector2(nextDouble() * rectangle.width, nextDouble() * rectangle.height)
+
+fun Random.point(circle: Circle) = Polar(nextDouble(360.0), nextDouble(circle.radius)).cartesian + circle.center
 
 infix fun <T, U> Iterable<T>.product(other: Iterable<U>): Iterable<Pair<T, U>> =
     flatMap { t -> other.map { u -> t to u } }
