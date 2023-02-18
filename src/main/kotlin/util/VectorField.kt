@@ -1,6 +1,7 @@
 package util
 
 import org.openrndr.math.Vector2
+import org.openrndr.math.Vector3
 
 private const val h = 1e-6
 
@@ -43,10 +44,18 @@ class ScalarField private constructor(private val f: (Vector2) -> Double) : ((Ve
         }
     }
 
+    fun normalVector(at: Vector2): Vector3 {
+        val (dx, dy) = gradient(at)
+        return Vector3(-dx, -dy, 1.0)
+    }
+
     companion object {
         operator fun invoke(f: (Vector2) -> Double) = ScalarField(f)
     }
 }
+
+fun ((Vector2) -> Vector2).toVectorField() = VectorField(this)
+fun ((Vector2) -> Double).toScalarField() = ScalarField(this)
 
 val ((Double) -> Double).diff
     get() = { x: Double ->

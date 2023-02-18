@@ -11,7 +11,6 @@ import org.openrndr.math.Vector2
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-const val SIMPLEX_ABS_LIM = 0.72
 private const val EPS = 1e-6
 
 fun squish(points: List<Double>, bucketCount: Int): List<Int> {

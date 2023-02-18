@@ -113,3 +113,5 @@ fun Random.point(circle: Circle) = Polar(nextDouble(360.0), nextDouble(circle.ra
 
 infix fun <T, U> Iterable<T>.product(other: Iterable<U>): Iterable<Pair<T, U>> =
     flatMap { t -> other.map { u -> t to u } }
+
+const val SIMPLEX_ABS_LIM = 0.72
