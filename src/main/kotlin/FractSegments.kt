@@ -1,3 +1,4 @@
+import org.openrndr.Fullscreen
 import org.openrndr.KEY_SPACEBAR
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
@@ -50,31 +51,69 @@ val hehe = object : Fract {
 
 fun main() = application {
     configure {
-        width = 1080
-        height = 720
+        width = 1920
+        height = 1080
+//        fullscreen = Fullscreen.SET_DISPLAY_MODE
     }
+    println(Vector2(1.0, 1.0).decompose(Vector2(2.0, 0.0), Vector2(1.0, -1.0)))
     program {
-        val fract: Fract = hehe
-        val initial = Segment(Vector2(width * 0.2, height * 0.5), Vector2(width * 0.8, height * 0.5))
+        val controlPoints = mutableListOf(
+            Vector2(width * 0.2, height * 0.5),
+            Vector2(width * 0.4, height * 0.5),
+            Vector2(width * 0.6, height * 0.5),
+            Vector2(width * 0.8, height * 0.5)
+        )
+        val controlPointRadius = 10.0
+
+        val fract: Fract = object : Fract {
+            override fun fract(seg: Segment): List<Segment> {
+                val pb1 = controlPoints.last() - controlPoints.first()
+                val pb2 = -Vector2(-pb1.y, pb1.x)
+                val vb1 = seg.end - seg.start
+                val vb2 = -Vector2(-vb1.y, vb1.x)
+
+                val r = controlPoints.zipWithNext { pi, pj ->
+                    val (aj, bj) = (pj - pi).decompose(pb1, pb2)
+                    val rj = vb1 * aj + vb2 * bj
+                    rj
+                }
+//                return (r + seg.end).zipWithNext { a, b -> Segment(seg.start + a, seg.start + b) }
+                return r.fold(listOf(seg.start)) { acc, rj -> acc + (rj + acc.last()) }
+                    .zipWithNext(::Segment)
+            }
+        }
+
         lateinit var segs: List<Segment>
         fun calc() {
             rs = makeRs()
-            segs = listOf(initial)
-            repeat(8) {
+//            segs = listOf(Segment(controlPoints[0], controlPoints[1]))
+            segs = controlPoints.zipWithNext { a, b -> Segment(a, b) }
+            repeat(7) {
                 segs = segs.flatMap { fract.fract(it) }
             }
         }
         calc()
-        keyboard.keyDown.listen {
-            if (it.key == KEY_SPACEBAR) {
-                calc()
+        var tgtIdx: Int? = null
+        mouse.buttonDown.listen {
+            for (i in controlPoints.indices) {
+                if ((it.position - controlPoints[i]).length < controlPointRadius) tgtIdx = i
+            }
+        }
+        mouse.buttonUp.listen {
+            tgtIdx = null
+            calc()
+        }
+        mouse.dragged.listen {
+            tgtIdx?.let { i ->
+                controlPoints[i] = it.position
             }
         }
         extend {
             drawer.isolated {
                 clear(ColorRGBa.WHITE)
+                fill = ColorRGBa.BLUE
                 for (s in segs) segment(s)
-//                segment(initial)
+                for (p in controlPoints) circle(p, controlPointRadius)
             }
         }
     }

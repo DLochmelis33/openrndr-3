@@ -115,3 +115,10 @@ infix fun <T, U> Iterable<T>.product(other: Iterable<U>): Iterable<Pair<T, U>> =
     flatMap { t -> other.map { u -> t to u } }
 
 const val SIMPLEX_ABS_LIM = 0.72
+
+inline fun Vector2.decompose(basis1: Vector2, basis2: Vector2): Pair<Double, Double> {
+    val (p, q) = basis1
+    val (g, h) = basis2
+    val (x, y) = this
+    return (h * x - g * y) / (h * p - g * q) to (q * x - p * y) / (g * q - h * p)
+}
