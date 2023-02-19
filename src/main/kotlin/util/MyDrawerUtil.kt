@@ -5,6 +5,11 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.ffmpeg.VideoWriter
 import timestamp
+import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectory
+import kotlin.io.path.isDirectory
+import kotlin.io.path.notExists
 
 const val widthUHD = 3840
 const val heightUHD = 2160
@@ -30,6 +35,27 @@ fun Drawer.multisampling(sampleCount: Int, function: Drawer.() -> Unit) {
     }
     rt.colorBuffer(0).copyTo(resolved)
     image(resolved)
+}
+
+fun Drawer.saveIsolatedMultisample(name: String = "", toDraw: Drawer.() -> Unit) {
+    println("saving...")
+    val widthUHD = 3840
+    val heightUHD = 2160
+    val rt = renderTarget(widthUHD, heightUHD, multisample = BufferMultisample.SampleCount(8)) {
+        colorBuffer()
+        depthBuffer()
+    }
+    withTarget(rt) {
+        toDraw()
+    }
+    val resolved = colorBuffer(widthUHD, heightUHD)
+    rt.colorBuffer(0).copyTo(resolved)
+    val savesFolder = Path("saves")
+    if(savesFolder.notExists() || !savesFolder.isDirectory()) {
+        savesFolder.createDirectory()
+    }
+    resolved.saveToFile(File("saves/$name-${timestamp()}.png"))
+    println("saved")
 }
 
 fun Program.videoExtend(

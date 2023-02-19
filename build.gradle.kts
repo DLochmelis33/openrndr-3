@@ -184,7 +184,7 @@ tasks.findByName("jpackageZip")?.dependsOn("jpackage")
 
 runtime {
     jpackage {
-        imageName = "openrndr-application"
+        imageName = applicationMainClass
         skipInstaller = true
         if (OperatingSystem.current() == OperatingSystem.MAC_OS) jvmArgs.add("-XstartOnFirstThread")
     }
