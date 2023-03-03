@@ -2,6 +2,9 @@ package util
 
 import org.openrndr.math.Vector2
 import org.openrndr.math.Vector3
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 private const val h = 1e-6
 
@@ -24,6 +27,16 @@ class VectorField private constructor(private val f: (Vector2) -> Vector2) : ((V
             val dxv = (this(v + xh) - this(v - xh)) / (2 * h)
             val dyv = (this(v + yh) - this(v - yh)) / (2 * h)
             dxv.x - dyv.y
+        }
+    }
+
+    val zeroDivergent: VectorField by lazy {
+        VectorField { p ->
+            val curl = Vector2(
+                f(Vector2(p.x + 1e-6, p.y)).y - f(Vector2(p.x - 1e-6, p.y)).y,
+                f(Vector2(p.x, p.y + 1e-6)).x - f(Vector2(p.x, p.y - 1e-6)).x
+            ) / 2e-6
+            Vector2(-curl.y, curl.x)
         }
     }
 
