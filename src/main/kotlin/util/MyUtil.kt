@@ -122,3 +122,20 @@ inline fun Vector2.decompose(basis1: Vector2, basis2: Vector2): Pair<Double, Dou
     val (x, y) = this
     return (h * x - g * y) / (h * p - g * q) to (q * x - p * y) / (g * q - h * p)
 }
+
+fun <T> zip(vararg iterables: Iterable<T>): Iterable<List<T>> {
+    return object : Iterable<List<T>> {
+        override fun iterator(): Iterator<List<T>> {
+            val iterators = iterables.map { it.iterator() }
+            return object : Iterator<List<T>> {
+                override fun hasNext(): Boolean {
+                    return iterators.all { it.hasNext() }
+                }
+
+                override fun next(): List<T> {
+                    return iterators.map { it.next() }
+                }
+            }
+        }
+    }
+}
