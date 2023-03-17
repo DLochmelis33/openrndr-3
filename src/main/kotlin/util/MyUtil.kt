@@ -139,3 +139,9 @@ fun <T> zip(vararg iterables: Iterable<T>): Iterable<List<T>> {
         }
     }
 }
+
+fun <T> loopCalc(calc: () -> T?): T {
+    while(true) {
+        calc()?.let { return it }
+    }
+}
