@@ -4,9 +4,9 @@ import kotlinx.coroutines.launch
 import org.openrndr.application
 import org.openrndr.color.ColorHSVa
 import org.openrndr.color.ColorRGBa
-import org.openrndr.draw.isolated
 import org.openrndr.extra.noise.Random
 import org.openrndr.extra.triangulation.Delaunay
+import util.triangles
 import kotlin.time.Duration.Companion.milliseconds
 
 fun main() = application {
@@ -14,9 +14,9 @@ fun main() = application {
         width = 1920
         height = 1080
     }
-    Random.randomizeSeed()
+    Random.seed = kotlin.random.Random.nextInt().toString()
     program {
-        val initPts = List(1000) { Random.point(drawer.bounds) }
+        val initPts = List(20000) { Random.point(drawer.bounds) }
         val triangles = Delaunay.from(initPts).triangles()
         val centers = triangles.map { it.centroid }
         val graph = List(centers.size) { mutableSetOf<Int>() } // map on indices
@@ -30,7 +30,7 @@ fun main() = application {
             }
         val colors = triangles.map { ColorRGBa.BLACK }.toMutableList()
         fun randomColor() = ColorHSVa(Random.double0(360.0), 1.0, 0.7).toRGBa()
-        val walkers = MutableList(5) { Random.int0(graph.size) to randomColor() }
+        val walkers = MutableList(200) { Random.int0(graph.size) to randomColor() }
         walkers.indices.forEach { t ->
             GlobalScope.launch {
                 while (true) {
@@ -47,12 +47,7 @@ fun main() = application {
             }
         }
         extend {
-            drawer.isolated {
-                for (i in graph.indices) {
-                    fill = colors[i]
-                    shape(triangles[i].shape)
-                }
-            }
+            drawer.triangles(triangles, colors)
         }
     }
 }

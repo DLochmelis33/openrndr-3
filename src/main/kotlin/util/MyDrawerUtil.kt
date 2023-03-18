@@ -4,6 +4,7 @@ import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
 import org.openrndr.ffmpeg.VideoWriter
+import org.openrndr.shape.Triangle
 import timestamp
 import java.io.File
 import kotlin.io.path.Path
@@ -51,7 +52,7 @@ fun Drawer.saveIsolatedMultisample(name: String = "", toDraw: Drawer.() -> Unit)
     val resolved = colorBuffer(widthUHD, heightUHD)
     rt.colorBuffer(0).copyTo(resolved)
     val savesFolder = Path("saves")
-    if(savesFolder.notExists() || !savesFolder.isDirectory()) {
+    if (savesFolder.notExists() || !savesFolder.isDirectory()) {
         savesFolder.createDirectory()
     }
     resolved.saveToFile(File("saves/$name-${timestamp()}.png"))
@@ -93,3 +94,30 @@ fun Program.videoExtend(
 //    scale(1.0 / upscale)
 //    image(rt.colorBuffer(0))
 //}
+
+fun Drawer.triangles(triangles: List<Triangle>, colors: List<ColorRGBa>) = isolated {
+    require(triangles.size == colors.size)
+    val n = triangles.size
+    val vb = vertexBuffer(vertexFormat {
+        position(3)
+        color(4)
+    }, 3 * n)
+    vb.put {
+        for (i in 0 until n) {
+            triangles[i].run {
+                val c = colors[i]
+                write(x1.xy0)
+                write(c)
+                write(x2.xy0)
+                write(c)
+                write(x3.xy0)
+                write(c)
+            }
+        }
+    }
+    shadeStyle = shadeStyle {
+        fragmentTransform = "x_fill = va_color;"
+    }
+    vertexBuffer(vb, DrawPrimitive.TRIANGLES)
+    vb.destroy()
+}
