@@ -1,18 +1,15 @@
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.colorBuffer
-import org.openrndr.extra.noise.perlin
 import org.openrndr.extra.noise.simplex
 import org.openrndr.extras.color.presets.ORANGE
 import org.openrndr.math.Vector2
 import org.openrndr.math.Vector3
 import org.openrndr.shape.Rectangle
 import util.RealPx
-import util.toScalarField
-import util.toVector2
+import util.SF
+import util.normalAt
 import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 fun main() = application {
@@ -24,9 +21,9 @@ fun main() = application {
     fun unitNoise(v: Vector2, sd: Int = seed) = (simplex(sd, v) + SIMPLEX_ABS_LIM) / (2 * SIMPLEX_ABS_LIM)
     program {
         val rpx = RealPx(this, 0.0, 0.0, 100.0)
-        val heightField = { v: Vector2 ->
+        val heightField: SF = { v: Vector2 ->
             unitNoise(v * 0.4) - abs(unitNoise(v * 0.1, seed + 1)) * 0.4
-        }.toScalarField()
+        }
         val shadowVector: Vector3 = Vector3(-2.0, 1.0, 0.2)
         val realBounds = run {
             val (x1, y1) = rpx.fromPx(0, 0)
@@ -53,7 +50,7 @@ fun main() = application {
                                 (it - v).length * shadowVector.z < heightField(it) - h
                             }
 
-                        val intensity: Double = heightField.normalVector(v).normalized.dot(shadowVector.normalized)
+                        val intensity: Double = heightField.normalAt(v).normalized.dot(shadowVector.normalized)
                         if (isShadowed) {
                             img[x, y] = ColorRGBa.ORANGE.shade(intensity * 0.1 + 0.3)
                         } else {

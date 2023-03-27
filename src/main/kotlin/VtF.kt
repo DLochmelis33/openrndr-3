@@ -7,11 +7,20 @@ import org.openrndr.extra.olive.oliveProgram
 import org.openrndr.extra.shapes.grid
 import org.openrndr.math.Vector2
 import org.openrndr.shape.LineSegment
-import util.ScalarField
-import util.VectorField
+import util.SF
+import util.VF
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+
+private val VF.customOp: VF
+    get() = { p ->
+        val curl = Vector2(
+            this(Vector2(p.x + 1e-6, p.y)).y - this(Vector2(p.x - 1e-6, p.y)).y,
+            this(Vector2(p.x, p.y + 1e-6)).x - this(Vector2(p.x, p.y - 1e-6)).x
+        ) / 2e-6
+        Vector2(-curl.y, curl.x)
+    }
 
 fun main() = application {
     configure {
@@ -21,14 +30,14 @@ fun main() = application {
     oliveProgram {
         val seed = Random.int()
         extend {
-            val vf = VectorField {
-                val x = 2.0 * it.x / width
-                val y = 2.0 * it.y / height
+            val vf: VF = { v: Vector2 ->
+                val x = 2.0 * v.x / width
+                val y = 2.0 * v.y / height
                 val speed = 0.05
                 Vector2(simplex(seed, x, y, seconds * speed), simplex(seed + 1, x, y, seconds * speed))
-            }.zeroDivergent
+            }.customOp
 
-            val hehe = ScalarField { v ->
+            val hehe: SF = { v ->
                 val n = 4 * 8
                 val radius = 5.0
                 val dTheta = 2 * PI / n
@@ -39,7 +48,7 @@ fun main() = application {
                     val vec = Vector2(-sin(theta), cos(theta))
                     integral += vf(point).normalized.dot(vec)
                 }
-                integral/n
+                integral / n
             }
 
             val points = drawer.bounds.grid(width * 0.02, height * 0.02).flatMap { it.map { it.center } }

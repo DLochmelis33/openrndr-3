@@ -7,8 +7,9 @@ import org.openrndr.extra.noise.simplex3D
 import org.openrndr.math.Vector2
 import org.openrndr.shape.Segment
 import util.RealPx
-import util.ScalarField
-import util.VectorField
+import util.VF
+import util.div
+import util.grad
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -28,7 +29,7 @@ fun main() = application {
         val realF = { x: Double, y: Double -> a3 * x * x * x - a3 * x * y * y + a2 * x * x - a2 * y * y + a1 * x + a0 }
         val imagF = { x: Double, y: Double -> a3 * x * x * y - a3 * y * y * y + a2 * x * y + a1 * y }
 
-        val vf = ScalarField { simplex(seed, it) }.gradient.divergence.gradient
+        val vf: VF = { v: Vector2 -> simplex(seed, v) }.grad.div.grad
 
         val points = makeGrid(30, 30).flatten()
         val ends = points.map { rpx.realScope(it) { t + vf(t) * 0.1 } }
@@ -38,7 +39,7 @@ fun main() = application {
             for ((point, end) in points zip ends) {
                 drawer.stroke = ColorRGBa.WHITE
                 drawer.lineSegment(point, end)
-                drawer.fill = ColorRGBa.PINK.shade(min(vf.divergence(rpx.fromPx(point)), 1.0) )
+                drawer.fill = ColorRGBa.PINK.shade(min(vf.div(rpx.fromPx(point)), 1.0) )
                 drawer.stroke = ColorRGBa.PINK
                 drawer.circle(point, 3.0)
             }
