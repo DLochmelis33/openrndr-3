@@ -1,5 +1,7 @@
 import org.openrndr.Program
 import org.openrndr.color.ColorRGBa
+import org.openrndr.draw.ColorBuffer
+import org.openrndr.draw.ColorBufferShadow
 import org.openrndr.math.Polar
 import org.openrndr.math.Vector2
 import org.openrndr.shape.Circle
@@ -144,4 +146,13 @@ fun <T> loopCalc(calc: () -> T?): T {
     while(true) {
         calc()?.let { return it }
     }
+}
+
+fun Double.normalize(min: Double = -SIMPLEX_ABS_LIM, max: Double = SIMPLEX_ABS_LIM) = (this - min) / (max - min)
+
+fun ColorBuffer.shadowContext(code: (ColorBufferShadow) -> Unit) {
+    val shadow = this.shadow
+    shadow.download()
+    code(shadow)
+    shadow.upload()
 }

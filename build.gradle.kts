@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 group = "org.openrndr.template"
 version = "0.4.0"
 
-val applicationMainClass = "FractSegmentsKt"
+val applicationMainClass = "Dune2Kt"
 
 /**  ## additional ORX features to be added to this project */
 val orxFeatures = setOf(
