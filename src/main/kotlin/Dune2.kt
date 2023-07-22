@@ -1,6 +1,5 @@
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
-import org.openrndr.draw.colorBuffer
 import org.openrndr.draw.renderTarget
 import org.openrndr.extra.noise.simplex
 import org.openrndr.extras.color.presets.DARK_ORANGE
@@ -9,7 +8,6 @@ import org.openrndr.math.Vector3
 import util.RealPx
 import util.SF
 import util.normalAt
-import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -23,8 +21,8 @@ fun main() = application {
         val rpx = RealPx(this, 0.0, 0.0, 400.0)
 
         val heightField: SF = { at ->
-            val s1 = simplex(seed, at).normalize()
-            val s2 = simplex(seed + 1, at).normalize()
+            val s1 = simplex(seed, at).normalized()
+            val s2 = simplex(seed + 1, at).normalized()
             min(s1, s2)
         }
 

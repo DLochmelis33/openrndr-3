@@ -148,7 +148,7 @@ fun <T> loopCalc(calc: () -> T?): T {
     }
 }
 
-fun Double.normalize(min: Double = -SIMPLEX_ABS_LIM, max: Double = SIMPLEX_ABS_LIM) = (this - min) / (max - min)
+fun Double.normalized(min: Double = -SIMPLEX_ABS_LIM, max: Double = SIMPLEX_ABS_LIM) = (this - min) / (max - min)
 
 fun ColorBuffer.shadowContext(code: (ColorBufferShadow) -> Unit) {
     val shadow = this.shadow
